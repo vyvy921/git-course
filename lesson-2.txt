@@ -1,12 +1,12 @@
 Cau 1:
-git init: khoi tao working space
-git add <file_name: them 1 file dang co trong working space vao vung staging directory
-git add . : them tat ca cac file dang co trong working space vao vung staging directory
+git init: khoi tao thu muc duoc quan ly boi git
+git add <file_name: them 1 file dang co trong working directory vao vung staging area
+git add . : them tat ca cac file dang co trong working directory vao vung staging area
 git commit -m "message": them cac file trong vung staging vao vung repository
 
 Cau 2:
 a. tao 3 files: file1, file2, file3
-b. git init: file1, file2, file3 -> duoc dua vao vung working space
+b. git init: khoi tao working directory, staging area, repository
 c. git commit -m "init project": khong co gi de commit len vung repository
 d. git add file1: file1 -> duoc dua vao vung staging space
 e. git commit -m "add file1": file1 duoc dua vao vung repository
