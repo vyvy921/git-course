@@ -1,13 +1,15 @@
-name: Auto Open Pull Request
+name: Auto Create Pull Request
 
 on:
   push:
+    # Lắng nghe sự kiện push trên tất cả các nhánh, NGOẠI TRỪ nhánh main/master
+
     branches-ignore:
       - main
       - master
 
 jobs:
-  auto-create-pr:
+  create-pr:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -33,3 +35,4 @@ jobs:
           else
             echo "PR đã tồn tại (#$PR_LIST). Bỏ qua bước tạo mới."
           fi
+
