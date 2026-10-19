@@ -1,0 +1,35 @@
+name: Auto Open Pull Request
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+
+jobs:
+  auto-create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create PR with GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Kiểm tra nếu nhánh này chưa có PR nào mở
+          PR_LIST=$(gh pr list --head "${{ github.ref_name }}" --base main --state open --json number -q '.[0].number')
+          
+          if [ -z "$PR_LIST" ]; then
+            echo "Creating Pull Request for ${{ github.ref_name }}..."
+            gh pr create \
+              --base main \
+              --head "${{ github.ref_name }}" \
+              --title "PR: [${{ github.ref_name }}] - Tự động tạo PR" \
+              --body "PR tự động sinh ra khi đẩy commit ${{ github.sha }} từ nhánh ${{ github.ref_name }}."
+          else
+            echo "PR đã tồn tại (#$PR_LIST). Bỏ qua bước tạo mới."
+          fi
