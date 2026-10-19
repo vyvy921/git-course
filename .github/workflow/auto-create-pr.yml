@@ -2,31 +2,35 @@ name: Auto Create Pull Request
 
 on:
   push:
-    # Lắng nghe sự kiện push trên tất cả các nhánh, NGOẠI TRỪ nhánh main/master
+    # Bỏ qua khi push trực tiếp vào main hoặc master
     branches-ignore:
       - main
       - master
 
 jobs:
-  create-pr:
+  create-pull-request:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
-      - name: Checkout repository code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create Pull Request automatically
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "auto: create pull request for pushed branch"
-          title: "PR: Merge ${{ github.ref_name }} into main"
-          body: |
-            Tự động tạo Pull Request từ nhánh `${{ github.ref_name }}`.
-            
-            - **Người thực hiện:** @${{ github.actor }}
-            - **Commit:** ${{ github.sha }}
-          branch: ${{ github.ref_name }}
-          base: main
+      - name: Create Pull Request with GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Kiểm tra xem nhánh này đã có Pull Request mở sẵn hay chưa
+          PR_EXISTS=$(gh pr list --head "${{ github.ref_name }}" --base main --state open --json number -q '.[0].number')
+          
+          if [ -z "$PR_EXISTS" ]; then
+            echo "Creating Pull Request for branch ${{ github.ref_name }}..."
+            gh pr create \
+              --base main \
+              --head "${{ github.ref_name }}" \
+              --title "PR: Merge ${{ github.ref_name }} into main" \
+              --body "Tự động tạo PR từ commit ${{ github.sha }} bởi @${{ github.actor }}."
+          else
+            echo "Pull Request already exists for this branch (PR #$PR_EXISTS). Skipping creation."
+          fi
